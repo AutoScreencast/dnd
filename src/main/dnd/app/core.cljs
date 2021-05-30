@@ -1,6 +1,7 @@
 (ns dnd.app.core
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]
+            ["react" :as react :refer [memo]]
             ["react-dnd" :as react-dnd :refer [DndProvider useDrag useDrop]]
             ["react-dnd-html5-backend" :as react-html5-backend :refer [HTML5Backend]]))
 
@@ -28,44 +29,48 @@
 (defn dustbin []
   [:>
    (fn []
-     (let [[{:keys [canDrop isOver]} drop] (useDrop (fn []
-                                                      (clj->js {:accept  (:BOX ItemTypes)
-                                                                :drop    #({:name "Dustbin"})
-                                                                :collect (fn [monitor]
-                                                                           {:isOver  (.isOver ^js monitor)
-                                                                            :canDrop (.canDrop ^js monitor)})})))
+     (let [[collectedProps drop] (useDrop
+                                   (fn []
+                                      #js {:accept  (:BOX ItemTypes)
+                                           :drop    (fn []
+                                                      #js {:name "Dustbin"})
+                                           :collect (fn [monitor]
+                                                      (let [#_#__ (js/console.log "isOver:::" (.isOver ^js monitor))
+                                                            #_#__ (js/console.log "canDrop:::" (.canDrop ^js monitor))]
+                                                        #js {:isOver  (.isOver ^js monitor)
+                                                             :canDrop (.canDrop ^js monitor)}))}))
+           canDrop (.-canDrop collectedProps)
+           isOver (.-isOver collectedProps)
            isActive (and canDrop isOver)
            background-color (cond
                               isActive "darkgreen"
                               canDrop "darkkhaki"
-                              :default "#222")]
+                              :else "#555")]
        (r/as-element [:div {:ref   drop
                             :role  "Dustbin"
-                            :style (merge dustbin-style {:background-color background-color})}
+                            :style (assoc dustbin-style :background-color background-color)}
                       (if isActive "Release to drop" "Drag a box here")])))])
 
 (defn box [{name :name}]
   [:>
    (fn []
-     (let [[{:keys [isDragging]} drag] (useDrag (fn []
-                                                  (clj->js {:type    (:BOX ItemTypes)
-                                                            :item    {:name name}
-                                                            :end     (fn [item monitor]
-                                                                       (let [_ (js/console.log "item:::" item)
-                                                                             _ (js/console.log "monitor:::" monitor)
-                                                                             dropResult (.getDropResult ^js monitor)
-                                                                             _ (js/console.log "item:::" item)
-                                                                             _ (js/console.log "dropResult:::" dropResult)]
-                                                                         (when (and item dropResult)
-                                                                           (js/alert (str "You dropped " (:name item) " into " (:name dropResult) "!")))))
-                                                            :collect (fn [monitor]
-                                                                       {:isDragging (.isDragging ^js monitor)
-                                                                        :handlerId  (.getHandlerId ^js monitor)})})))
-           #_#__ (js/console.log "name:::" name)
+     (let [[collectedProps drag] (useDrag
+                                   (fn []
+                                     #js {:type    (:BOX ItemTypes)
+                                          :item    {:name name}
+                                          :end     (fn [item monitor]
+                                                     (let [dropResult (.getDropResult ^js monitor)]
+                                                       (when (and item dropResult)
+                                                         (js/alert (str "You dropped " (:name item) " into " (.-name dropResult) "!")))))
+                                          :collect (fn [monitor]
+                                                     (let [_ (js/console.log "isDragging" (.isDragging ^js monitor))]
+                                                       #js {:isDragging (.isDragging ^js monitor)
+                                                            :handlerId  (.getHandlerId ^js monitor)}))}))
+           isDragging (.-isDragging collectedProps)
            opacity (if isDragging 0.4 1)]
        (r/as-element [:div {:ref   drag
                             :role  "Box"
-                            :style (merge box-style {:opacity opacity})}
+                            :style (assoc box-style :opacity opacity)}
                       name])))])
 
 (defn container []
