@@ -5,18 +5,21 @@
             ["react-dnd" :as react-dnd :refer [DndProvider]]
             ["react-dnd-html5-backend" :as react-html5-backend :refer [HTML5Backend]]
 
+            [dnd.app.blocks-w :as blocks] ;; Aaron's 100 block example
             #_[dnd.app.dustbin :as dustbin]
             #_[dnd.app.dustbin-f :as dustbin]
-            [dnd.app.dustbin-w :as dustbin]))
-
-
-
+            #_[dnd.app.dustbin-w :as dustbin]))
 
 
 (defn app []
   [:div.app
    [:> DndProvider {:backend HTML5Backend}
-    [dustbin/container]]])
+    [blocks/container]
+
+    #_[dnd.app.dustbin :as dustbin]
+    #_[dnd.app.dustbin-f :as dustbin]
+    #_[dnd.app.dustbin-w :as dustbin]]])
+
 
 ;; --- Render ---
 
