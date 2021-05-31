@@ -59,7 +59,7 @@
              :style {:z-index 100 :padding "4px" :background-color "grey" :position :relative}}
        "id: " id])]])
 
-(defn container []
+(defn example []
   [:div
    [:div "Welcome to react-dnd-in-reagent"
     (map (fn [x] ^{:key x} [block x]) (range 0 100))

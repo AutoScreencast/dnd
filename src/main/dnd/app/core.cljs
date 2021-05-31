@@ -14,11 +14,8 @@
 (defn app []
   [:div.app
    [:> DndProvider {:backend HTML5Backend}
-    [blocks/container]
-
-    #_[dnd.app.dustbin :as dustbin]
-    #_[dnd.app.dustbin-f :as dustbin]
-    #_[dnd.app.dustbin-w :as dustbin]]])
+    [blocks/example]
+    #_[dustbin/example]]])
 
 
 ;; --- Render ---

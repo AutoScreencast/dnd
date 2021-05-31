@@ -64,7 +64,7 @@
                                                                   :canDrop (.canDrop ^js monitor)}))}))]
        (r/as-element (reagent-child-fn drop-ref dnd-props))))])
 
-(defn container []
+(defn example []
   [:div
 
    ;; --- DROP ---

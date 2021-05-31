@@ -69,7 +69,7 @@
            :style (assoc dustbin-style :background-color background-color)}
      (if isActive "Release to drop" "Drag a box here")]))
 
-(defn container []
+(defn example []
   [:div
    [:div {:style {:overflow :hidden, :clear :both}}
     [:f> dustbin]]
