@@ -3,6 +3,9 @@
             ["react" :as react :refer [memo]]
             ["react-dnd" :as react-dnd :refer [useDrag useDrop]]))
 
+;; Note: WARNING in Chrome
+;; [Violation] 'drop' handler took 1113ms (HTML5BackendImpl.js:341)
+
 (def ItemTypes {:BOX "box"})
 
 (def box-style {:border "1px dashed gray"
@@ -23,6 +26,30 @@
                     :fontSize "1rem"
                     :lineHeight :normal
                     :float :left})
+
+(defn box [{name :name}]
+  [:>
+   (fn []
+     (let [[collectedProps drag] (useDrag
+                                   (fn []
+                                     #js {:type    (:BOX ItemTypes)
+                                          :item    {:name name}
+                                          :end     (fn [item monitor]
+                                                     (let [dropResult (.getDropResult ^js monitor)]
+                                                       (when (and item dropResult)
+                                                         (js/alert (str "You dropped " (:name item) " into " (.-name dropResult) "!")))))
+                                          :collect (fn [monitor]
+                                                     (let [_ _]
+                                                       #js {:isDragging (.isDragging ^js monitor)
+                                                            :handlerId  (.getHandlerId ^js monitor)}))}))
+           _ (js/console.log "Render box" name)
+           isDragging (.-isDragging collectedProps)
+           _ (js/console.log "isDragging" isDragging name)
+           opacity (if isDragging 0.4 1)]
+       (r/as-element [:div {:ref   drag
+                            :role  "Box"
+                            :style (assoc box-style :opacity opacity)}
+                      name])))])
 
 (defn dustbin []
   [:>
@@ -48,30 +75,6 @@
                             :role  "Dustbin"
                             :style (assoc dustbin-style :background-color background-color)}
                       (if isActive "Release to drop" "Drag a box here")])))])
-
-(defn box [{name :name}]
-  [:>
-   (fn []
-     (let [[collectedProps drag] (useDrag
-                                   (fn []
-                                     #js {:type    (:BOX ItemTypes)
-                                          :item    {:name name}
-                                          :end     (fn [item monitor]
-                                                     (let [dropResult (.getDropResult ^js monitor)]
-                                                       (when (and item dropResult)
-                                                         (js/alert (str "You dropped " (:name item) " into " (.-name dropResult) "!")))))
-                                          :collect (fn [monitor]
-                                                     (let [_ _]
-                                                       #js {:isDragging (.isDragging ^js monitor)
-                                                            :handlerId  (.getHandlerId ^js monitor)}))}))
-           _ (js/console.log "Render box" name)
-           isDragging (.-isDragging collectedProps)
-           _ (js/console.log "isDragging" isDragging name)
-           opacity (if isDragging 0.4 1)]
-       (r/as-element [:div {:ref   drag
-                            :role  "Box"
-                            :style (assoc box-style :opacity opacity)}
-                      name])))])
 
 (defn container []
   [:div

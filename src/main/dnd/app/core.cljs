@@ -5,7 +5,13 @@
             ["react-dnd" :as react-dnd :refer [DndProvider]]
             ["react-dnd-html5-backend" :as react-html5-backend :refer [HTML5Backend]]
 
-            [dnd.app.dustbin :as dustbin]))
+            #_[dnd.app.dustbin :as dustbin]
+            #_[dnd.app.dustbin-f :as dustbin]
+            [dnd.app.dustbin-w :as dustbin]))
+
+
+
+
 
 (defn app []
   [:div.app
